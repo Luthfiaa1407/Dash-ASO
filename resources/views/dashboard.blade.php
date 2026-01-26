@@ -5,7 +5,7 @@
 @section('content')
 
 @php
-// ===== MOCK DATA UNTUK FRONTEND SAJA =====
+// ===== MOCK DATA =====
 // Top 3 Teknisi Terbaik
 $top3 = [
     ['name'=>'RENTA DINATA','unit'=>'GTM','wonum'=>5,'percent'=>100],
@@ -13,7 +13,7 @@ $top3 = [
     ['name'=>'BUDI','unit'=>'XYZ','wonum'=>4,'percent'=>95],
 ];
 
-// Top 10 Teknisi (ambil 10 pertama dari data API nanti)
+// Top 10 Teknisi
 $top10 = [];
 for($i=1;$i<=20;$i++){
     $top10[] = [
@@ -24,8 +24,6 @@ for($i=1;$i<=20;$i++){
         'status' => ['Target','Cukup','Kurang'][rand(0,2)]
     ];
 }
-
-// Hanya 10 pertama untuk dashboard
 $top10_dashboard = array_slice($top10, 0, 10);
 
 // Summary cards
@@ -37,15 +35,15 @@ $summary = [
 @endphp
 
 <style>
-/* ================= LAYOUT ================= */
+/* ============ LAYOUT ============ */
 .container {
     display: grid;
-    grid-template-columns: 420px 1fr; 
+    grid-template-columns: 420px 1fr;
     gap: 24px;
     padding: 24px;
 }
 
-/* ================= CARD ================= */
+/* ============ CARD ============ */
 .table-card {
     background: #ffffff;
     border-radius: 14px;
@@ -59,7 +57,7 @@ $summary = [
     color: #0F2A44;
 }
 
-/* ================= TOP 3 ================= */
+/* ============ TOP 3 ============ */
 .top3-card {
     background: linear-gradient(135deg, #0F2A44, #1F3C88);
     color: #fff;
@@ -76,7 +74,7 @@ $summary = [
     border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 
-/* ================= TABLE ================= */
+/* ============ TABLE ============ */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -101,13 +99,12 @@ tbody tr:hover {
 
 .text-center { text-align: center; }
 
-/* ================= BADGE ================= */
+/* ============ BADGE ============ */
 .badge {
     padding: 4px 12px;
-    border-radius: 999px;
+    border-radius: 9999px;
     font-size: 11px;
     font-weight: 600;
-    white-space: nowrap;
     display: inline-block;
 }
 
@@ -115,19 +112,20 @@ tbody tr:hover {
 .badge.warning { background: #F59E0B; color: #fff; }
 .badge.danger  { background: #EF4444; color: #fff; }
 
-/* ================= BUTTON ================= */
+/* ============ BUTTON ============ */
 .btn-detail {
     background: #0F2A44;
     color: #fff;
     padding: 8px 22px;
-    border-radius: 999px;
+    border-radius: 9999px;
     font-size: 12px;
     text-decoration: none;
+    cursor: pointer;
 }
 
 .btn-detail:hover { background: #0c2236; }
 
-/* ================= RIGHT ================= */
+/* ============ RIGHT ============ */
 .main {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -170,11 +168,52 @@ tbody tr:hover {
     color: #6B7280;
 }
 
-/* ================= RESPONSIVE ================= */
-@media (max-width: 992px) {
-    .container { grid-template-columns: 1fr; }
-    .main { grid-template-columns: 1fr; }
-    .chart-card { grid-column: span 1; }
+/* ============ DATE FILTER ============ */
+.date-filter {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    flex-wrap: nowrap;
+}
+
+.date-filter .filter-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-filter input {
+    padding: 6px 12px;
+    border-radius: 9999px;
+    border: 1px solid #D1D5DB;
+    font-size: 12px;
+    min-width: 100px;
+    max-width: 160px;
+}
+
+.date-filter button {
+    padding: 6px 12px;      
+    border-radius: 9999px;  
+    font-size: 12px;        
+    background: #0F2A44;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.date-filter button:hover {
+    background: #0c2236;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+    .date-filter input {
+        min-width: 80px;
+    }
+    .date-filter button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
 }
 </style>
 
@@ -182,6 +221,21 @@ tbody tr:hover {
 
     <!-- LEFT -->
     <div>
+
+        <!-- DATE FILTER -->
+        <div class="table-card">
+            <div class="date-filter">
+                <div class="filter-item">
+                    <label for="startDate">Start Date:</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div class="filter-item">
+                    <label for="endDate">End Date:</label>
+                    <input type="date" id="endDate">
+                </div>
+                <button onclick="updateData()">Search</button>
+            </div>
+        </div>
 
         <!-- TOP 3 -->
         <div class="table-card top3-card">
@@ -250,22 +304,41 @@ tbody tr:hover {
         </div>
         @endforeach
 
+        <!-- CHARTS -->
         <div class="chart-card">
-            <h4>Total Closing Berdasarkan STO</h4>
+            <h4>Total Complete Berdasarkan STO</h4>
             <div class="chart-placeholder">Chart Area</div>
         </div>
 
         <div class="chart-card">
-            <h4>Jumlah Order per Vendor</h4>
+            <h4>Total Order dan Unorder</h4>
             <div class="chart-placeholder">Chart Area</div>
         </div>
 
         <div class="chart-card">
-            <h4>Presentase Pekerjaan</h4>
+            <h4>Persentase Keterangan</h4>
+            <div class="chart-placeholder">Chart Area</div>
+        </div>
+
+        <div class="chart-card">
+            <h4>Jumlah Pesanan per Zona</h4>
             <div class="chart-placeholder">Chart Area</div>
         </div>
     </div>
 
 </div>
+
+<script>
+function updateData() {
+    const start = document.getElementById('startDate').value;
+    const end = document.getElementById('endDate').value;
+    if(!start || !end) {
+        alert('Pilih start dan end date terlebih dahulu!');
+        return;
+    }
+    console.log('Filter tanggal dari', start, 'sampai', end);
+    // TODO: panggil API/backend untuk update tabel dan chart sesuai tanggal
+}
+</script>
 
 @endsection
