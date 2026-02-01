@@ -4,36 +4,6 @@
 
 @section('content')
 
-@php
-// ===== MOCK DATA =====
-// Top 3 Teknisi Terbaik
-$top3 = [
-    ['name'=>'RENTA DINATA','unit'=>'GTM','wonum'=>5,'percent'=>100],
-    ['name'=>'ANGGI','unit'=>'HOKI','wonum'=>4,'percent'=>100],
-    ['name'=>'BUDI','unit'=>'XYZ','wonum'=>4,'percent'=>95],
-];
-
-// Top 10 Teknisi
-$top10 = [];
-for($i=1;$i<=20;$i++){
-    $top10[] = [
-        'name' => "TEKNISI $i",
-        'unit' => "UNIT $i",
-        'wonum' => rand(1,5),
-        'percent' => rand(30,100),
-        'status' => ['Target','Cukup','Kurang'][rand(0,2)]
-    ];
-}
-$top10_dashboard = array_slice($top10, 0, 10);
-
-// Summary cards
-$summary = [
-    ['label'=>'Total Vendor','value'=>26],
-    ['label'=>'Total Order','value'=>108],
-    ['label'=>'Total Teknisi','value'=>50],
-];
-@endphp
-
 <style>
 /* ============ LAYOUT ============ */
 .container {
@@ -273,7 +243,7 @@ tbody tr:hover {
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($top10_dashboard as $t)
+                    @foreach($top10 as $t)
                     <tr>
                         <td>{{ $t['name'] }} <small>({{ $t['unit'] }})</small></td>
                         <td class="text-center">{{ $t['wonum'] }}</td>

@@ -8,102 +8,102 @@ class DashboardDataService
         protected GoogleSheetService $sheet
     ) {}
 
-    protected function data(): array
+    protected function data()
     {
         return $this->sheet->getMappedData();
     }
 
-    /**
-     * Helper status (keterangan)
-     */
-    protected function status(array $row): string
-    {
-        return strtoupper(trim($row['keterangan'] ?? ''));
-    }
-
-    /**
-     * Helper tanggal (Date Modified)
-     */
-    protected function date(array $row): ?string
-    {
-        return $row['date_modified'] ?? null;
-    }
-
-    // 1️⃣ Grafik STO Complete (PS)
-    public function completePerSTO(): array
+    // TOP 3 TEKNISI
+    public function top3Teknisi()
     {
         $result = [];
 
         foreach ($this->data() as $row) {
-            if ($this->status($row) !== 'COMPLETE') continue;
+            if (str_contains(strtoupper($row['keterangan'] ?? ''), 'COMPLETE')) {
+                $name = $row['nama_teknisi_1'] ?? '-';
+                $unit = $row['sto'] ?? '-';
+                $key = $name.'|'.$unit;
 
-            $sto = $row['sto'] ?? null;
-            if (!$sto) continue;
+                $result[$key]['name']  = $name;
+                $result[$key]['unit']  = $unit;
+                $result[$key]['wonum'] = ($result[$key]['wonum'] ?? 0) + 1;
+            }
+        }
 
-            $result[$sto] = ($result[$sto] ?? 0) + 1;
+        usort($result, fn($a,$b) => $b['wonum'] <=> $a['wonum']);
+
+        return array_slice(array_map(function($r){
+            $r['percent'] = 100;
+            return $r;
+        }, $result), 0, 3);
+    }
+
+    // TOP 10 TEKNISI
+    public function top10Teknisi()
+    {
+        $result = [];
+
+        foreach ($this->data() as $row) {
+            $name = $row['nama_teknisi_1'] ?? '-';
+            $unit = $row['sto'] ?? '-';
+            $key  = $name.'|'.$unit;
+
+            $result[$key]['name']  = $name;
+            $result[$key]['unit']  = $unit;
+            $result[$key]['wonum'] = ($result[$key]['wonum'] ?? 0) + 1;
+        }
+
+        usort($result, fn($a,$b) => $b['wonum'] <=> $a['wonum']);
+
+        return array_slice(array_map(function($r){
+            $r['percent'] = rand(60,100);
+            $r['status']  = $r['percent'] >= 90 ? 'Target' : ($r['percent'] >= 70 ? 'Cukup' : 'Kurang');
+            return $r;
+        }, $result), 0, 10);
+    }
+
+    // SUMMARY CARD
+    public function summaryCards()
+    {
+        $rows = $this->data();
+
+        return [
+            ['label'=>'Total Vendor', 'value'=>count(array_unique(array_column($rows,'sto')))],
+            ['label'=>'Total Order', 'value'=>count($rows)],
+            ['label'=>'Total Teknisi', 'value'=>count(array_unique(array_column($rows,'nama_teknisi_1')))],
+        ];
+    }
+
+    // CHART STO COMPLETE
+    public function completePerSTO()
+    {
+        $result = [];
+
+        foreach ($this->data() as $row) {
+            if (str_contains(strtoupper($row['keterangan'] ?? ''), 'COMPLETE')) {
+                $sto = $row['sto'] ?? '-';
+                $result[$sto] = ($result[$sto] ?? 0) + 1;
+            }
         }
 
         return $result;
     }
 
-    // 2️⃣ Order vs Complete (berdasarkan Date Modified)
-    public function orderVsComplete(): array
+    // ORDER VS COMPLETE
+    public function orderVsComplete()
     {
         $order = [];
         $complete = [];
 
         foreach ($this->data() as $row) {
-            $date = $this->date($row);
-            if (!$date) continue;
-
-            // Semua data = Order
+            $date = $row['date_modified'] ?? '-';
             $order[$date] = ($order[$date] ?? 0) + 1;
 
-            // COMPLETE = PS
-            if ($this->status($row) === 'COMPLETE') {
+            if (str_contains(strtoupper($row['keterangan'] ?? ''), 'COMPLETE')) {
                 $complete[$date] = ($complete[$date] ?? 0) + 1;
             }
         }
 
-        ksort($order);
-        ksort($complete);
-
-        return compact('order', 'complete');
-    }
-
-    // 3️⃣ Top 3 Teknisi (berdasarkan COMPLETE)
-    public function topTeknisi(): array
-    {
-        $teknisi = [];
-
-        foreach ($this->data() as $row) {
-            if ($this->status($row) !== 'COMPLETE') continue;
-
-            $name = $row['nama_teknisi_1'] ?? null;
-            if (!$name) continue;
-
-            $teknisi[$name] = ($teknisi[$name] ?? 0) + 1;
-        }
-
-        arsort($teknisi);
-
-        return array_slice($teknisi, 0, 3, true);
-    }
-
-    // 4️⃣ PS per STO (PS = COMPLETE)
-    public function psPerSTO(): array
-    {
-        $ps = [];
-
-        foreach ($this->data() as $row) {
-            if ($this->status($row) !== 'COMPLETE') continue;
-
-            $sto = $row['sto'] ?? null;
-            if (!$sto) continue;
-
-            $ps[$sto] = ($ps[$sto] ?? 0) + 1;
-        }
-
-        return $ps;
+        return compact('order','complete');
     }
 }

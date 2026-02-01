@@ -10,10 +10,11 @@ class DashboardController extends Controller
     public function index(DashboardDataService $service)
     {
         return view('dashboard', [
-            'stoChart'   => $service->completePerSTO(),
-            'orderVsDone'=> $service->orderVsComplete(),
-            'topTeknisi' => $service->topTeknisi(),
-            'psPerSTO'   => $service->psPerSTO(),
+            'top3'      => $service->top3Teknisi(),
+            'top10'     => $service->top10Teknisi(),
+            'summary'   => $service->summaryCards(),
+            'stoChart'  => $service->completePerSTO(),
+            'orderChart'=> $service->orderVsComplete(),
         ]);
     }
 }
