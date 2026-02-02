@@ -128,14 +128,9 @@ tbody tr:hover {
     box-shadow: 0 10px 24px rgba(0,0,0,0.06);
 }
 
-.chart-placeholder {
-    height: 200px;
-    background: linear-gradient(135deg, #F3F4F6, #E5E7EB);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #6B7280;
+/* === BATASI UKURAN CHART (TAMBAHAN SAJA) === */
+.chart-card canvas {
+    max-height: 260px;
 }
 
 /* ============ DATE FILTER ============ */
@@ -161,9 +156,9 @@ tbody tr:hover {
 }
 
 .date-filter button {
-    padding: 6px 12px;      
-    border-radius: 9999px;  
-    font-size: 12px;        
+    padding: 6px 12px;
+    border-radius: 9999px;
+    font-size: 12px;
     background: #0F2A44;
     color: #fff;
     border: none;
@@ -173,17 +168,6 @@ tbody tr:hover {
 
 .date-filter button:hover {
     background: #0c2236;
-}
-
-/* RESPONSIVE */
-@media (max-width: 480px) {
-    .date-filter input {
-        min-width: 80px;
-    }
-    .date-filter button {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
 }
 </style>
 
@@ -196,11 +180,11 @@ tbody tr:hover {
         <div class="table-card">
             <div class="date-filter">
                 <div class="filter-item">
-                    <label for="startDate">Start Date:</label>
+                    <label>Start Date:</label>
                     <input type="date" id="startDate">
                 </div>
                 <div class="filter-item">
-                    <label for="endDate">End Date:</label>
+                    <label>End Date:</label>
                     <input type="date" id="endDate">
                 </div>
                 <button onclick="updateData()">Search</button>
@@ -277,38 +261,110 @@ tbody tr:hover {
         <!-- CHARTS -->
         <div class="chart-card">
             <h4>Total Complete Berdasarkan STO</h4>
-            <div class="chart-placeholder">Chart Area</div>
+            <canvas id="chartSto"></canvas>
         </div>
 
         <div class="chart-card">
             <h4>Total Order dan Unorder</h4>
-            <div class="chart-placeholder">Chart Area</div>
+            <canvas id="chartOrder"></canvas>
         </div>
 
         <div class="chart-card">
             <h4>Persentase Keterangan</h4>
-            <div class="chart-placeholder">Chart Area</div>
+            <canvas id="chartStatus"></canvas>
         </div>
 
         <div class="chart-card">
             <h4>Jumlah Pesanan per Zona</h4>
-            <div class="chart-placeholder">Chart Area</div>
+            <canvas id="chartZona"></canvas>
         </div>
     </div>
 
 </div>
+
+<!-- CHART JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 function updateData() {
     const start = document.getElementById('startDate').value;
     const end = document.getElementById('endDate').value;
     if(!start || !end) {
-        alert('Pilih start dan end date terlebih dahulu!');
+        alert('Pilih tanggal!');
         return;
     }
-    console.log('Filter tanggal dari', start, 'sampai', end);
-    // TODO: panggil API/backend untuk update tabel dan chart sesuai tanggal
+    console.log(start, end);
 }
+
+/* ===== STO BAR ===== */
+new Chart(chartSto, {
+    type: 'bar',
+    data: {
+        labels: ['BDU','BDK','KBL','KDI','KLA','KLU','MDN','PKP','SBY','YOG'],
+        datasets: [{
+            data: [8,2,9,4,5,3,22,4,8,3],
+            backgroundColor: '#7f1d1d'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins:{legend:{display:false}}
+    }
+});
+
+/* ===== ORDER UNORDER ===== */
+new Chart(chartOrder, {
+    type: 'bar',
+    data: {
+        labels: ['UNORDER'],
+        datasets: [{
+            data: [118],
+            backgroundColor: '#991b1b'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins:{legend:{display:false}}
+    }
+});
+
+/* ===== PIE STATUS ===== */
+new Chart(chartStatus, {
+    type: 'pie',
+    data: {
+        labels: ['Complete','Cukup','Kurang'],
+        datasets: [{
+            data: [92,10,7],
+            backgroundColor: ['#7f1d1d','#b91c1c','#9ca3af']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins:{
+            legend:{ position:'bottom' }
+        }
+    }
+});
+
+/* ===== ZONA BAR ===== */
+new Chart(chartZona, {
+    type: 'bar',
+    data: {
+        labels: ['KT','TK','TR','TA','BD','BJ','KBL','KDI','KLU','MDN'],
+        datasets: [{
+            data: [7,24,10,11,3,9,5,3,7,2],
+            backgroundColor: '#0F2A44'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins:{legend:{display:false}}
+    }
+});
 </script>
 
 @endsection
