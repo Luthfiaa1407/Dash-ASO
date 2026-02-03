@@ -44,6 +44,15 @@
     border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 
+/* ==== FIX ROW PUTIH TOP 3 (INI SAJA YANG DITAMBAHKAN) ==== */
+.top3-card tbody tr {
+    background: transparent !important;
+}
+
+.top3-card tbody tr:hover {
+    background: rgba(255,255,255,0.08) !important;
+}
+
 /* ============ TABLE ============ */
 table {
     width: 100%;
@@ -128,7 +137,7 @@ tbody tr:hover {
     box-shadow: 0 10px 24px rgba(0,0,0,0.06);
 }
 
-/* === BATASI UKURAN CHART (TAMBAHAN SAJA) === */
+/* BATASI TINGGI CHART */
 .chart-card canvas {
     max-height: 260px;
 }
@@ -138,7 +147,6 @@ tbody tr:hover {
     display: flex;
     align-items: flex-end;
     gap: 12px;
-    flex-wrap: nowrap;
 }
 
 .date-filter .filter-item {
@@ -151,19 +159,16 @@ tbody tr:hover {
     border-radius: 9999px;
     border: 1px solid #D1D5DB;
     font-size: 12px;
-    min-width: 100px;
-    max-width: 160px;
 }
 
 .date-filter button {
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 9999px;
     font-size: 12px;
     background: #0F2A44;
     color: #fff;
     border: none;
     cursor: pointer;
-    white-space: nowrap;
 }
 
 .date-filter button:hover {
@@ -177,23 +182,22 @@ tbody tr:hover {
     <div>
 
         <!-- DATE FILTER -->
-        <div class = "table-card">
-             <form method="GET" action="{{ route('Dashboard') }}">
+        <div class="table-card">
+            <form method="GET" action="{{ route('Dashboard') }}">
                 <div class="date-filter">
                     <div class="filter-item">
                         <label>Start Date:</label>
                         <input type="date" name="start_date" value="{{ request('start_date') }}">
                     </div>
-
                     <div class="filter-item">
                         <label>End Date:</label>
                         <input type="date" name="end_date" value="{{ request('end_date') }}">
                     </div>
-
-                    <button type="submit" id="btnSearch">Search</button>
-                </div> 
+                    <button type="submit">Search</button>
+                </div>
             </form>
-        </div>   
+        </div>
+
         <!-- TOP 3 -->
         <div class="table-card top3-card">
             <h4>Top 3 Teknisi Terbaik</h4>
@@ -210,7 +214,9 @@ tbody tr:hover {
                     <tr>
                         <td>{{ $t['name'] }} <small>({{ $t['unit'] }})</small></td>
                         <td class="text-center">{{ $t['wonum'] }}</td>
-                        <td class="text-center"><span class="badge success">{{ $t['percent'] }}%</span></td>
+                        <td class="text-center">
+                            <span class="badge success">{{ $t['percent'] }}%</span>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -261,7 +267,6 @@ tbody tr:hover {
         </div>
         @endforeach
 
-        <!-- CHARTS -->
         <div class="chart-card">
             <h4>Total Complete Berdasarkan STO</h4>
             <canvas id="chartSto"></canvas>
@@ -285,21 +290,9 @@ tbody tr:hover {
 
 </div>
 
-<!-- CHART JS -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-function updateData() {
-    const start = document.getElementById('startDate').value;
-    const end = document.getElementById('endDate').value;
-    if(!start || !end) {
-        alert('Pilih tanggal!');
-        return;
-    }
-    console.log(start, end);
-}
-
-/* ===== STO BAR ===== */
 new Chart(chartSto, {
     type: 'bar',
     data: {
@@ -309,14 +302,9 @@ new Chart(chartSto, {
             backgroundColor: '#7f1d1d'
         }]
     },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins:{legend:{display:false}}
-    }
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
 });
 
-/* ===== ORDER UNORDER ===== */
 new Chart(chartOrder, {
     type: 'bar',
     data: {
@@ -326,14 +314,9 @@ new Chart(chartOrder, {
             backgroundColor: '#991b1b'
         }]
     },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins:{legend:{display:false}}
-    }
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
 });
 
-/* ===== PIE STATUS ===== */
 new Chart(chartStatus, {
     type: 'pie',
     data: {
@@ -343,16 +326,9 @@ new Chart(chartStatus, {
             backgroundColor: ['#7f1d1d','#b91c1c','#9ca3af']
         }]
     },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins:{
-            legend:{ position:'bottom' }
-        }
-    }
+    options:{responsive:true,maintainAspectRatio:false}
 });
 
-/* ===== ZONA BAR ===== */
 new Chart(chartZona, {
     type: 'bar',
     data: {
@@ -362,11 +338,7 @@ new Chart(chartZona, {
             backgroundColor: '#0F2A44'
         }]
     },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins:{legend:{display:false}}
-    }
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
 });
 </script>
 
