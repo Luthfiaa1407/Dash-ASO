@@ -81,24 +81,23 @@ tbody tr:hover {
                 </tr>
             </thead>
             <tbody>
-                <!-- Contoh banyak data statis -->
-                @for($i=1; $i<=30; $i++)
+                @forelse($teknisi as $t)
                 <tr>
-                    <td>TEKNISI {{ $i }}</td>
-                    <td class="text-center">{{ rand(1,5) }}</td>
-                    <td class="text-center">{{ rand(30,100) }}%</td>
+                    <td>{{ $t['name'] }} <small>({{ $t['unit'] }})</small></td>
+                    <td class="text-center">{{ $t ['wonum'] }}</td>
+                    <td class="text-center">{{ $t['percent'] }}%</td>
                     <td class="text-center">
-                        @php $p = rand(1,3); @endphp
-                        @if($p==1)
-                            <span class="badge success">Target</span>
-                        @elseif($p==2)
-                            <span class="badge warning">Cukup</span>
-                        @else
-                            <span class="badge danger">Kurang</span>
-                        @endif
-                    </td>
-                </tr>
-                @endfor
+                        <span class="badge 
+                        {{ $t['status']=='Target' ? 'success' : ($t['status']=='Cukup' ? 'warning' : 'danger') }}">
+                        {{ $t['status'] }}
+                    </span>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="4" class="text-center">Data tidak tersedia</td>
+            </tr>
+            @endforelse
             </tbody>
         </table>
     </div>

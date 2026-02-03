@@ -177,20 +177,23 @@ tbody tr:hover {
     <div>
 
         <!-- DATE FILTER -->
-        <div class="table-card">
-            <div class="date-filter">
-                <div class="filter-item">
-                    <label>Start Date:</label>
-                    <input type="date" id="startDate">
-                </div>
-                <div class="filter-item">
-                    <label>End Date:</label>
-                    <input type="date" id="endDate">
-                </div>
-                <button onclick="updateData()">Search</button>
-            </div>
-        </div>
+        <div class = "table-card">
+             <form method="GET" action="{{ route('Dashboard') }}">
+                <div class="date-filter">
+                    <div class="filter-item">
+                        <label>Start Date:</label>
+                        <input type="date" name="start_date" value="{{ request('start_date') }}">
+                    </div>
 
+                    <div class="filter-item">
+                        <label>End Date:</label>
+                        <input type="date" name="end_date" value="{{ request('end_date') }}">
+                    </div>
+
+                    <button type="submit" id="btnSearch">Search</button>
+                </div> 
+            </form>
+        </div>   
         <!-- TOP 3 -->
         <div class="table-card top3-card">
             <h4>Top 3 Teknisi Terbaik</h4>

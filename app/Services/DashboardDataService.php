@@ -4,77 +4,119 @@ namespace App\Services;
 
 class DashboardDataService
 {
-    public function __construct(
+    protected $startDate = null;
+    protected $endDate = null;
+
+    public function __construct (
         protected GoogleSheetService $sheet
-    ) {}
+    ){}
+
+    //DATE FILTER
+    public function setDateFilter($start, $end)
+    {
+        $this->startDate = $start;
+        $this->endDate   = $end;
+    }
+
+    protected function applyDateFilter(array $data)
+    {
+    if (!$this->startDate || !$this->endDate) {
+        return $data;
+    }
+
+    return array_filter($data, function ($row) {
+        if (empty($row['date_modified'])) {
+            return false;
+        }
+        $date = date('Y-m-d', strtotime($row['date_modified']));
+        return $date >= $this->startDate && $date <= $this->endDate;
+    });
+    }
 
     protected function data()
     {
-        return $this->sheet->getMappedData();
+        $rows = $this->sheet->getMappedData();
+        return $this->applyDateFilter($rows);
     }
 
-    // TOP 3 TEKNISI
+    //ALL TEKNISI (DETAIL)
+    public function allteknisi()
+    {
+        $daily = [];
+
+        // hitung wonum per teknisi per hari
+        foreach ($this->data() as $row) {
+
+            $name = $row['nama_teknisi_1'] ?? null;
+            $unit = $row['sto'] ?? '-';
+            $date = $row['date_modified'] ?? null;
+
+            if (!$name || !$date) continue;
+
+            $key = $name.'|'.$unit.'|'.$date;
+
+            $daily[$key]['name']  = $name;
+            $daily[$key]['unit']  = $unit;
+            $daily[$key]['wonum'] = ($daily[$key]['wonum'] ?? 0) + 1;
+        }
+
+        $result = [];
+
+        foreach ($daily as $d) {
+
+            $wonum   = $d['wonum'];
+            $percent = min(100, $wonum * 33);
+
+            $status =
+                $percent == 100 ? 'Target' :
+                ($percent >= 66 ? 'Cukup' : 'Kurang');
+
+            $result[] = [
+                'name'    => $d['name'],
+                'unit'    => $d['unit'],
+                'wonum'   => $wonum,
+                'percent' => $percent,
+                'status'  => $status,
+            ];
+        }
+
+        return $result;
+    }
+
+    //TOP 3 TEKNISI
     public function top3Teknisi()
     {
-        $result = [];
+        $data = $this->allteknisi();
 
-        foreach ($this->data() as $row) {
-            if (str_contains(strtoupper($row['keterangan'] ?? ''), 'COMPLETE')) {
-                $name = $row['nama_teknisi_1'] ?? '-';
-                $unit = $row['sto'] ?? '-';
-                $key = $name.'|'.$unit;
+        usort($data, fn($a,$b) => $b['wonum'] <=> $a['wonum']);
 
-                $result[$key]['name']  = $name;
-                $result[$key]['unit']  = $unit;
-                $result[$key]['wonum'] = ($result[$key]['wonum'] ?? 0) + 1;
-            }
-        }
-
-        usort($result, fn($a,$b) => $b['wonum'] <=> $a['wonum']);
-
-        return array_slice(array_map(function($r){
-            $r['percent'] = 100;
-            return $r;
-        }, $result), 0, 3);
+        return array_slice($data, 0, 3);
     }
 
-    // TOP 10 TEKNISI
+    //TOP 10 TEKNISI
     public function top10Teknisi()
     {
-        $result = [];
+        $data = $this->allteknisi();
 
-        foreach ($this->data() as $row) {
-            $name = $row['nama_teknisi_1'] ?? '-';
-            $unit = $row['sto'] ?? '-';
-            $key  = $name.'|'.$unit;
+        usort($data, fn($a,$b) => $b['wonum'] <=> $a['wonum']);
 
-            $result[$key]['name']  = $name;
-            $result[$key]['unit']  = $unit;
-            $result[$key]['wonum'] = ($result[$key]['wonum'] ?? 0) + 1;
-        }
-
-        usort($result, fn($a,$b) => $b['wonum'] <=> $a['wonum']);
-
-        return array_slice(array_map(function($r){
-            $r['percent'] = rand(60,100);
-            $r['status']  = $r['percent'] >= 90 ? 'Target' : ($r['percent'] >= 70 ? 'Cukup' : 'Kurang');
-            return $r;
-        }, $result), 0, 10);
+        return array_slice($data, 0, 10);
     }
 
-    // SUMMARY CARD
+    //SUMMARY CARD
+
     public function summaryCards()
     {
         $rows = $this->data();
 
         return [
-            ['label'=>'Total Vendor', 'value'=>count(array_unique(array_column($rows,'sto')))],
-            ['label'=>'Total Order', 'value'=>count($rows)],
-            ['label'=>'Total Teknisi', 'value'=>count(array_unique(array_column($rows,'nama_teknisi_1')))],
+            ['label'=>'Total Vendor',  'value'=>count(array_unique(array_column($rows,'sto')))],
+            ['label'=>'Total Order',   'value'=>count($rows)],
+            ['label'=>'Total Teknisi','value'=>count(array_unique(array_column($rows,'nama_teknisi_1')))],
         ];
     }
 
-    // CHART STO COMPLETE
+    //STO COMPLETE CHART
     public function completePerSTO()
     {
         $result = [];
@@ -89,13 +131,14 @@ class DashboardDataService
         return $result;
     }
 
-    // ORDER VS COMPLETE
+    //ORDER VS COMPLETE
     public function orderVsComplete()
     {
         $order = [];
         $complete = [];
 
         foreach ($this->data() as $row) {
+
             $date = $row['date_modified'] ?? '-';
             $order[$date] = ($order[$date] ?? 0) + 1;
 
