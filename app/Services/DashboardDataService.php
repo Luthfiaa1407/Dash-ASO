@@ -4,6 +4,7 @@ namespace App\Services;
 
 class DashboardDataService
 {
+    protected $cachedData = null;
     protected $startDate = null;
     protected $endDate = null;
 
@@ -159,22 +160,64 @@ class DashboardDataService
         return $result;
     }
 
-    //ORDER VS COMPLETE
-    public function orderVsComplete()
+    //ORDER VS UNORDER
+    public function orderUnorderTotal()
     {
-        $order = [];
-        $complete = [];
+        $order = 0;
+        $unorder = 0;
 
         foreach ($this->data() as $row) {
 
-            $date = $row['date_modified'] ?? '-';
-            $order[$date] = ($order[$date] ?? 0) + 1;
+            $type = strtoupper($row['order/unorder'] ?? '');
 
-            if (str_contains(strtoupper($row['keterangan'] ?? ''), 'COMPLETE')) {
-                $complete[$date] = ($complete[$date] ?? 0) + 1;
+            if (str_contains($type, 'UNORDER')) {
+                $unorder++;
+            } else {
+                $order++;
             }
         }
 
-        return compact('order','complete');
+        return [
+            'order'   => $order,
+            'unorder' => $unorder,
+        ];
     }
+
+
+    // ORDER PER ZONA
+    public function orderPerZona()
+    {
+        $result = [];
+
+        foreach ($this->data() as $row) {
+            $zona = trim($row['sto'] ?? '');
+
+            if ($zona === '') continue;
+
+            $result[$zona] = ($result[$zona] ?? 0) + 1;
+        }
+
+        arsort($result);
+
+        return $result;
+    }
+
+    //keterangan
+    public function statusData()
+    {
+        $result = [];
+
+        foreach ($this->data() as $row) {
+            $ket = strtoupper(trim($row['keterangan'] ?? 'LAINNYA'));
+
+            if ($ket === '') {
+                $ket = 'LAINNYA';
+            }
+
+            $result[$ket] = ($result[$ket] ?? 0) + 1;
+        }
+
+        return $result;
+    }
+
 }

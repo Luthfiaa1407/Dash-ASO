@@ -13,6 +13,4 @@ Route::get('/login', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('Dashboard');
 
-Route::get('/detail', function () {
-    return view('detail');
-});
+Route::get('/detail', [DashboardController::class, 'detail'])->name('Detail');

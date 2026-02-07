@@ -17,13 +17,21 @@ class DashboardController extends Controller
         }
 
         return view('dashboard', [
-            'top3'     => $service->top3Teknisi(),
-            'top10'    => $service->top10Teknisi(),
-            'summary'  => $service->summaryCards(),
+            'top3' => $service->top3Teknisi(),
+            'top10' => $service->top10Teknisi(),
+            'summary' => $service->summaryCards(),
             'stoChart' => $service->completePerSTO(),
-            'orderVs'  => $service->orderVsComplete(),
+            'orderBar'  => $service->orderUnorderTotal(),
+            'zona' => $service ->orderPerZona(),
+            'statusData' => $service ->statusData(),
+            
+
         ]);
 
+    }
+
+    public function detail(DashboardDataService $service)
+    {
         return view('detail', [
             'teknisi' => $service->allteknisi()
         ]);

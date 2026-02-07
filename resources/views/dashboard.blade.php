@@ -290,57 +290,102 @@ tbody tr:hover {
 
 </div>
 
+<script>
+    const stoComplete = @json($stoChart);
+    const orderBar = @json($orderBar);
+    const zonaData = @json($zona);
+    const statusData = @json($statusData);
+</script>
+
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-new Chart(chartSto, {
-    type: 'bar',
-    data: {
-        labels: ['BDU','BDK','KBL','KDI','KLA','KLU','MDN','PKP','SBY','YOG'],
-        datasets: [{
-            data: [8,2,9,4,5,3,22,4,8,3],
-            backgroundColor: '#7f1d1d'
-        }]
-    },
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
-});
+document.addEventListener('DOMContentLoaded', function () {
 
-new Chart(chartOrder, {
-    type: 'bar',
-    data: {
-        labels: ['UNORDER'],
-        datasets: [{
-            data: [118],
-            backgroundColor: '#991b1b'
-        }]
-    },
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
-});
+    /* ================= STO COMPLETE ================= */
+    new Chart(document.getElementById('chartSto'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(stoComplete),
+            datasets: [{
+                data: Object.values(stoComplete),
+                backgroundColor: '#7f1d1d'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
 
-new Chart(chartStatus, {
-    type: 'pie',
-    data: {
-        labels: ['Complete','Cukup','Kurang'],
-        datasets: [{
-            data: [92,10,7],
-            backgroundColor: ['#7f1d1d','#b91c1c','#9ca3af']
-        }]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-});
 
-new Chart(chartZona, {
-    type: 'bar',
-    data: {
-        labels: ['KT','TK','TR','TA','BD','BJ','KBL','KDI','KLU','MDN'],
-        datasets: [{
-            data: [7,24,10,11,3,9,5,3,7,2],
-            backgroundColor: '#0F2A44'
-        }]
-    },
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}
+    /* ================= ORDER UNORDER ================= */
+    new Chart(document.getElementById('chartOrder'), {
+        type: 'bar',
+        data: {
+            labels: ['ORDER', 'UNORDER'],
+            datasets: [{
+                data: [orderBar.order, orderBar.unorder],
+                backgroundColor: ['#991b1b', '#7f1d1d']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
+
+
+    /* ================= STATUS ================= */
+    new Chart(document.getElementById('chartStatus'), {
+        type: 'pie',
+        data: {
+            labels: Object.keys(statusData),
+            datasets: [{
+                data: Object.values(statusData),
+                backgroundColor: ['#7f1d1d','#f59e0b','#9ca3af']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+
+    /* ================= ZONA ================= */
+    new Chart(document.getElementById('chartZona'), {
+        type: 'bar',
+        data: {
+            labels: Object.keys(zonaData),
+            datasets: [{
+                label: 'Jumlah Pesanan',
+                data: Object.values(zonaData),
+                backgroundColor: '#7f1d1d'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
 });
 </script>
+
 
 @endsection
