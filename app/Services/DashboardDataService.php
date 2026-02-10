@@ -101,9 +101,9 @@ class DashboardDataService
             if($s['wonum'] >= 60){
                 $status = 'Target';
             } elseif ($s['wonum'] >= 30){
-                $status = 'cukup';
+                $status = 'Cukup';
             } else {
-                $status = 'kurang';
+                $status = 'Kurang';
             }
 
             $result[] = [
