@@ -98,9 +98,9 @@ class DashboardDataService
 
             $avgPercent = round($s['total_percent'] / $s['days']);
 
-            if($s['wonum'] >= 60){
+            if($avgPercent >= 67){
                 $status = 'Target';
-            } elseif ($s['wonum'] >= 30){
+            } elseif ($avgPercent >= 34){
                 $status = 'Cukup';
             } else {
                 $status = 'Kurang';

@@ -53,7 +53,7 @@
 </style>
 
 <div class="navbar">
-    <span class="navbar-title">Monitoring</span>
+    <span class="navbar-title">Monitoring Kinerja Teknisi</span>
 
     <div class="navbar-right">
         <div class="navbar-tabs">

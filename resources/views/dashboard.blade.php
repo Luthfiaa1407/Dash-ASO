@@ -44,7 +44,6 @@
     border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 
-/* ==== FIX ROW PUTIH TOP 3 (INI SAJA YANG DITAMBAHKAN) ==== */
 .top3-card tbody tr {
     background: transparent !important;
 }
@@ -104,7 +103,7 @@ tbody tr:hover {
 
 .btn-detail:hover { background: #0c2236; }
 
-/* ============ RIGHT ============ */
+/* ============ RIGHT GRID ============ */
 .main {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -174,137 +173,151 @@ tbody tr:hover {
 .date-filter button:hover {
     background: #0c2236;
 }
+
+/* ===== PIE CHART LEGEND SAMPING ===== */
+.status-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+#chartStatus {
+    width: 100% !important;
+    height: 300px !important;
+}
+
 </style>
 
 <div class="container">
 
-    <!-- LEFT -->
-    <div>
+<!-- LEFT -->
+<div>
 
-        <!-- DATE FILTER -->
-        <div class="table-card">
-            <form method="GET" action="{{ route('Dashboard') }}">
-                <div class="date-filter">
-                    <div class="filter-item">
-                        <label>Start Date:</label>
-                        <input type="date" name="start_date" value="{{ request('start_date') }}">
-                    </div>
-                    <div class="filter-item">
-                        <label>End Date:</label>
-                        <input type="date" name="end_date" value="{{ request('end_date') }}">
-                    </div>
-                    <button type="submit">Search</button>
+    <!-- DATE FILTER -->
+    <div class="table-card">
+        <form method="GET" action="{{ route('Dashboard') }}">
+            <div class="date-filter">
+                <div class="filter-item">
+                    <label>Start Date:</label>
+                    <input type="date" name="start_date" value="{{ request('start_date') }}">
                 </div>
-            </form>
-        </div>
-
-        <!-- TOP 3 -->
-        <div class="table-card top3-card">
-            <h4>Top 3 Teknisi Terbaik</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nama Teknisi</th>
-                        <th class="text-center">Wonum</th>
-                        <th class="text-center">Persentase</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($top3 as $t)
-                    <tr>
-                        <td>{{ $t['name'] }} <small>({{ $t['unit'] }})</small></td>
-                        <td class="text-center">{{ $t['wonum'] }}</td>
-                        <td class="text-center">
-                            <span class="badge success">{{ $t['percent'] }}%</span>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-        <!-- TOP 10 -->
-        <div class="table-card">
-            <h4>Top 10 Teknisi</h4>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nama Teknisi</th>
-                        <th class="text-center">Wonum</th>
-                        <th class="text-center">Persentase</th>
-                        <th class="text-center">Keterangan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($top10 as $t)
-                    <tr>
-                        <td>{{ $t['name'] }} <small>({{ $t['unit'] }})</small></td>
-                        <td class="text-center">{{ $t['wonum'] }}</td>
-                        <td class="text-center">{{ $t['percent'] }}%</td>
-                        <td class="text-center">
-                            <span class="badge {{ $t['status']=='Target'?'success':($t['status']=='Cukup'?'warning':'danger') }}">
-                                {{ $t['status'] }}
-                            </span>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-            <div style="text-align:center;margin-top:16px;">
-                <a href="/detail" class="btn-detail">Lihat Detail</a>
+                <div class="filter-item">
+                    <label>End Date:</label>
+                    <input type="date" name="end_date" value="{{ request('end_date') }}">
+                </div>
+                <button type="submit">Search</button>
             </div>
-        </div>
-
+        </form>
     </div>
 
-    <!-- RIGHT -->
-    <div class="main">
-        @foreach($summary as $s)
-        <div class="summary-card">
-            <h2>{{ $s['value'] }}</h2>
-            <span>{{ $s['label'] }}</span>
-        </div>
-        @endforeach
+    <!-- TOP 3 -->
+    <div class="table-card top3-card">
+        <h4>Top 3 Teknisi Terbaik</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Teknisi</th>
+                    <th class="text-center">Wonum</th>
+                    <th class="text-center">Persentase</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($top3 as $t)
+                <tr>
+                    <td>{{ $t['name'] }} <small>({{ $t['unit'] }})</small></td>
+                    <td class="text-center">{{ $t['wonum'] }}</td>
+                    <td class="text-center"><span class="badge success">{{ $t['percent'] }}%</span></td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
-        <div class="chart-card">
-            <h4>Total Complete Berdasarkan STO</h4>
-            <canvas id="chartSto"></canvas>
-        </div>
+    <!-- TOP 10 -->
+    <div class="table-card">
+        <h4>Top 10 Teknisi</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Teknisi</th>
+                    <th class="text-center">Wonum</th>
+                    <th class="text-center">Persentase</th>
+                    <th class="text-center">Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($top10 as $t)
+                <tr>
+                    <td>{{ $t['name'] }} <small>({{ $t['unit'] }})</small></td>
+                    <td class="text-center">{{ $t['wonum'] }}</td>
+                    <td class="text-center">{{ $t['percent'] }}%</td>
+                    <td class="text-center">
+                        <span class="badge {{ $t['status']=='Target'?'success':($t['status']=='Cukup'?'warning':'danger') }}">
+                            {{ $t['status'] }}
+                        </span>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
 
-        <div class="chart-card">
-            <h4>Total Order dan Unorder</h4>
-            <canvas id="chartOrder"></canvas>
-        </div>
-
-        <div class="chart-card">
-            <h4>Persentase Keterangan</h4>
-            <canvas id="chartStatus"></canvas>
-        </div>
-
-        <div class="chart-card">
-            <h4>Jumlah Pesanan per Zona</h4>
-            <canvas id="chartZona"></canvas>
+        <div style="text-align:center;margin-top:16px;">
+            <a href="/detail" class="btn-detail">Lihat Detail</a>
         </div>
     </div>
 
 </div>
 
-<script>
-    const stoComplete = @json($stoChart);
-    const orderBar = @json($orderBar);
-    const zonaData = @json($zona);
-    const statusData = @json($statusData);
-</script>
+<!-- RIGHT -->
+<div class="main">
 
+    @foreach($summary as $s)
+    <div class="summary-card">
+        <h2>{{ $s['value'] }}</h2>
+        <span>{{ $s['label'] }}</span>
+    </div>
+    @endforeach
+
+    <div class="chart-card">
+        <h4>Total Complete Berdasarkan STO</h4>
+        <canvas id="chartSto"></canvas>
+    </div>
+
+    <div class="chart-card">
+        <h4>Total Order dan Unorder</h4>
+        <canvas id="chartOrder"></canvas>
+    </div>
+
+    <!-- PIE STATUS -->
+    <div class="chart-card">
+        <h4>Persentase Keterangan</h4>
+        <div class="status-wrapper">
+            <canvas id="chartStatus"></canvas>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <h4>Jumlah Pesanan per Zona</h4>
+        <canvas id="chartZona"></canvas>
+    </div>
+
+</div>
+</div>
+
+<script>
+const stoComplete = @json($stoChart);
+const orderBar = @json($orderBar);
+const zonaData = @json($zona);
+const statusData = @json($statusData);
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    /* ================= STO COMPLETE ================= */
-    new Chart(document.getElementById('chartSto'), {
+    /* STO COMPLETE */
+    new Chart(chartSto, {
         type: 'bar',
         data: {
             labels: Object.keys(stoComplete),
@@ -313,54 +326,50 @@ document.addEventListener('DOMContentLoaded', function () {
                 backgroundColor: '#7f1d1d'
             }]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
-        }
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
     });
 
-
-    /* ================= ORDER UNORDER ================= */
-    new Chart(document.getElementById('chartOrder'), {
+    /* ORDER UNORDER */
+    new Chart(chartOrder, {
         type: 'bar',
         data: {
-            labels: ['ORDER', 'UNORDER'],
+            labels: ['ORDER','UNORDER'],
             datasets: [{
                 data: [orderBar.order, orderBar.unorder],
-                backgroundColor: ['#991b1b', '#7f1d1d']
+                backgroundColor: ['#991b1b','#7f1d1d']
+            }]
+        },
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
+    });
+
+    /* ===== PIE STATUS (LEGEND SAMPING TURUN) ===== */
+    new Chart(chartStatus, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(statusData),
+            datasets: [{
+                data: Object.values(statusData),
+                backgroundColor: ['#7f1d1d','#b91c1c','#f59e0b','#9ca3af','#111827']
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }
+                legend: {
+                    position: 'right',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 10,
+                        font: { size: 12 }
+                    }
+                }
             }
         }
     });
 
-
-
-    /* ================= STATUS ================= */
-    new Chart(document.getElementById('chartStatus'), {
-        type: 'pie',
-        data: {
-            labels: Object.keys(statusData),
-            datasets: [{
-                data: Object.values(statusData),
-                backgroundColor: ['#7f1d1d','#f59e0b','#9ca3af']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-
-    /* ================= ZONA ================= */
-    new Chart(document.getElementById('chartZona'), {
+    /* ZONA */
+    new Chart(chartZona, {
         type: 'bar',
         data: {
             labels: Object.keys(zonaData),
@@ -371,21 +380,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{legend:{display:false}},
+            scales:{y:{beginAtZero:true}}
         }
     });
 
 });
 </script>
-
 
 @endsection
